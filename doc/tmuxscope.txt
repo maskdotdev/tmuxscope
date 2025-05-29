@@ -1,0 +1,142 @@
+*tmuxscope.txt*          Tmux session manager for Telescope
+
+==============================================================================
+CONTENTS                                                    *tmuxscope-contents*
+
+    1. Introduction ................................. |tmuxscope-introduction|
+    2. Requirements ................................. |tmuxscope-requirements|
+    3. Installation ................................. |tmuxscope-installation|
+    4. Configuration ................................ |tmuxscope-configuration|
+    5. Commands ..................................... |tmuxscope-commands|
+    6. Mappings ..................................... |tmuxscope-mappings|
+    7. Functions .................................... |tmuxscope-functions|
+    8. Healthcheck .................................. |tmuxscope-healthcheck|
+    9. License ...................................... |tmuxscope-license|
+
+==============================================================================
+1. INTRODUCTION                                         *tmuxscope-introduction*
+
+Tmuxscope is a Telescope extension that provides a seamless way to manage tmux
+sessions directly from within Neovim. It allows you to:
+
+• List and switch between existing tmux sessions
+• Create new tmux sessions from project directories
+• Create new directories and sessions simultaneously
+• Delete unwanted sessions
+• All with the familiar Telescope interface
+
+==============================================================================
+2. REQUIREMENTS                                         *tmuxscope-requirements*
+
+• Neovim >= 0.7.0
+• telescope.nvim
+• tmux (command-line tool)
+
+==============================================================================
+3. INSTALLATION                                         *tmuxscope-installation*
+
+Using lazy.nvim: >
+    {
+      'rodrez/tmuxscope.nvim',
+      dependencies = {
+        'nvim-telescope/telescope.nvim',
+      },
+      config = function()
+        require('telescope').load_extension('tmuxscope')
+      end,
+    }
+<
+
+Using packer.nvim: >
+    use {
+      'rodrez/tmuxscope.nvim',
+      requires = { 'nvim-telescope/telescope.nvim' },
+      config = function()
+        require('telescope').load_extension('tmuxscope')
+      end,
+    }
+<
+
+==============================================================================
+4. CONFIGURATION                                       *tmuxscope-configuration*
+
+Setup the extension with custom configuration: >
+    require('telescope').setup {
+      extensions = {
+        tmuxscope = {
+          search_paths = {
+            '~/projects',
+            '~/work',
+            '~/dev',
+            '~/.config',
+            '~/Documents',
+          },
+          tmux_command = 'tmux',
+        }
+      }
+    }
+    require('telescope').load_extension('tmuxscope')
+<
+
+Configuration options:                              *tmuxscope-config-options*
+
+search_paths        (table)   Directories to search for projects when creating
+                              new sessions. Default: {'~/projects', '~/work',
+                              '~/dev', '~/.config', '~/Documents'}
+
+tmux_command        (string)  Command to use for tmux operations.
+                              Default: 'tmux'
+
+==============================================================================
+5. COMMANDS                                               *tmuxscope-commands*
+
+:Telescope tmuxscope sessions                           *:Telescope-tmuxscope-sessions*
+    Open the tmux sessions picker. Lists all existing tmux sessions with
+    additional information like window count and attachment status.
+
+:Telescope tmuxscope new_session                        *:Telescope-tmuxscope-new_session*
+    Open the new session picker. Shows directories from configured search
+    paths where you can create new tmux sessions.
+
+:Telescope tmuxscope create_dir_session                 *:Telescope-tmuxscope-create_dir_session*
+    Open the create directory and session picker. Allows you to select a base
+    directory and then create a new subdirectory with a tmux session.
+
+==============================================================================
+6. MAPPINGS                                               *tmuxscope-mappings*
+
+Sessions picker mappings:
+  <CR>      Switch to selected session
+  <C-x>     Delete selected session
+
+New session picker mappings:
+  <CR>      Create session in selected directory
+
+Create directory picker mappings:
+  <CR>      Select base directory and prompt for new directory name
+
+==============================================================================
+7. FUNCTIONS                                             *tmuxscope-functions*
+
+require('telescope').extensions.tmuxscope.sessions({opts})
+    Open the sessions picker with optional telescope picker options.
+
+require('telescope').extensions.tmuxscope.new_session({opts})
+    Open the new session picker with optional telescope picker options.
+
+require('telescope').extensions.tmuxscope.create_dir_session({opts})
+    Open the create directory and session picker with optional options.
+
+==============================================================================
+8. HEALTHCHECK                                         *tmuxscope-healthcheck*
+
+Run `:checkhealth tmuxscope` to verify that all dependencies are properly
+installed and configured.
+
+==============================================================================
+9. LICENSE                                               *tmuxscope-license*
+
+MIT License. See LICENSE file for details.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl: 
