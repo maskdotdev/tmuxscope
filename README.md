@@ -84,19 +84,27 @@ This will show directories from your configured search paths where you can creat
 
 ## Configuration
 
+You can customize the directories that are searched for new sessions.
+
+Each search path can be a simple string, or a table containing a `path` and a `depth` key. The `depth` key controls how many subdirectories are searched.
+
 Add to your telescope setup:
 
 ```lua
 require('telescope').setup {
   extensions = {
     tmuxscope = {
+      -- Each path can be a string or a table with 'path' and 'depth' keys.
+      -- 'depth' specifies how many directories deep to search.
       search_paths = {
-        '~/projects',
-        '~/work',
-        '~/dev',
-        '~/.config',
+        '~/projects', -- uses default_search_depth
+        { path = '~/work', depth = 3 },
+        { path = '~/dev', depth = 1 },
+        { path = '~/.config', depth = 1 },
         '~/Documents',
       },
+      -- Default depth for search_paths if not specified as a table
+      default_search_depth = 2,
       tmux_command = 'tmux', -- Optional: specify tmux command path
     },
   },
