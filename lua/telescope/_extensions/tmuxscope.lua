@@ -10,13 +10,18 @@ local M = {}
 -- Default configuration
 local default_config = {
 	-- Paths to search for new session creation
+	-- Each entry can be a string or a table:
+	-- - A string: "~/path/to/search" (uses default depth)
+	-- - A table: { path = "~/path/to/search", depth = 2 }
 	search_paths = {
-		"~/projects",
-		"~/work",
-		"~/dev",
-		"~/.config",
-		"~/Documents",
+		{ path = "~/projects", depth = 2 },
+		{ path = "~/work", depth = 2 },
+		{ path = "~/dev", depth = 2 },
+		{ path = "~/.config", depth = 1 },
+		{ path = "~/Documents", depth = 1 },
 	},
+	-- Default depth for search_paths if not specified
+	default_search_depth = 2,
 	-- Additional tmux options
 	tmux_command = "tmux",
 }
@@ -122,14 +127,35 @@ end
 local function get_directories()
 	local directories = {}
 
-	for _, search_path in ipairs(M.config.search_paths) do
+	for _, search_item in ipairs(M.config.search_paths) do
+		local search_path
+		local max_depth
+
+		if type(search_item) == "table" then
+			search_path = search_item.path
+			max_depth = search_item.depth or M.config.default_search_depth
+		elseif type(search_item) == "string" then
+			search_path = search_item
+			max_depth = M.config.default_search_depth
+		else
+			vim.notify(
+				"TmuxScope: Invalid entry in search_paths. Should be a string or a table.",
+				vim.log.levels.WARN
+			)
+			goto continue
+		end
+
 		-- Expand tilde
 		local expanded_path = vim.fn.expand(search_path)
 
 		-- Check if path exists
 		if vim.fn.isdirectory(expanded_path) == 1 then
 			-- Get subdirectories
-			local cmd = 'find "' .. expanded_path .. '" -maxdepth 2 -type d 2>/dev/null'
+			local cmd = string.format(
+				'find "%s" -maxdepth %d -type d 2>/dev/null',
+				expanded_path,
+				max_depth
+			)
 			local result = execute_command(cmd)
 
 			if result then
@@ -142,6 +168,7 @@ local function get_directories()
 				end
 			end
 		end
+		::continue::
 	end
 
 	return directories
@@ -229,7 +256,17 @@ M.new_session = function(opts)
 	local directories = get_directories()
 
 	if #directories == 0 then
-		print("No directories found in configured search paths: " .. table.concat(M.config.search_paths, ", "))
+		local path_strings = {}
+		for _, search_item in ipairs(M.config.search_paths) do
+			if type(search_item) == "table" then
+				table.insert(path_strings, search_item.path)
+			else
+				table.insert(path_strings, search_item)
+			end
+		end
+		print(
+			"No directories found in configured search paths: " .. table.concat(path_strings, ", ")
+		)
 		return
 	end
 
