@@ -7,6 +7,8 @@ local action_state = require("telescope.actions.state")
 
 local M = {}
 
+M.version = "0.2.0"
+
 -- Default configuration
 local default_config = {
 	-- Paths to search for new session creation
