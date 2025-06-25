@@ -7,7 +7,7 @@ local action_state = require("telescope.actions.state")
 
 local M = {}
 
-M.version = "0.2.0"
+M.version = "0.2.1"
 
 -- Default configuration
 local default_config = {
